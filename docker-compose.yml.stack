@@ -1,6 +1,12 @@
 version: '3.9'
 
-x-base_service: &base_service
+services:
+
+  auto:
+    # build: ./services/AUTOMATIC1111
+    image: sd-auto:67
+    environment:
+      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
     ports:
       - "${WEBUI_PORT:-7860}:7860"
     volumes:
@@ -9,27 +15,20 @@ x-base_service: &base_service
     stop_signal: SIGKILL
     tty: true
     deploy:
-      # placement:
-      #   constraints:
-      #     - node.labels.gpu == true
-      resources:
-        reservations:
-          devices:
-              - driver: nvidia
-                device_ids: ['0']
-                capabilities: [compute, utility]
+      placement:
+        constraints:
+          - node.labels.gpu == true
 
-name: sd-webui-docker
 
-services:
 
-  auto: &automatic
-    <<: *base_service
-    profiles: ["auto"]
-    build: ./services/AUTOMATIC1111
-    image: sd-auto:67
-    environment:
-      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
+      # resources:
+      #   reservations:
+      #     devices:
+      #         - driver: nvidia
+      #           device_ids: ['0']
+      #           capabilities: [compute, utility]
+
+
 
   # download:
   #   build: ./services/download/
